@@ -3,6 +3,7 @@ using OrangeLand.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
+using OrangeLand.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
+UsersAPI.Map(app);
 
 
 app.Run();
