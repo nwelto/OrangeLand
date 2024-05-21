@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using OrangeLand.API;
+using OrangeLand.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 

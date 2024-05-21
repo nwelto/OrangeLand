@@ -67,7 +67,7 @@ namespace OrangeLand.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<string>(type: "text", nullable: false)
+                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -171,13 +171,13 @@ namespace OrangeLand.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Email", "Name", "Phone", "Role" },
+                columns: new[] { "Id", "Email", "IsAdmin", "Name", "Phone" },
                 values: new object[,]
                 {
-                    { 1, "manager@orangland.com", "Manager", "123-456-7890", "Manager" },
-                    { 2, "employee1@orangland.com", "Employee1", "123-456-7891", "Employee" },
-                    { 3, "employee2@orangland.com", "Employee2", "123-456-7892", "Employee" },
-                    { 4, "employee3@orangland.com", "Employee3", "123-456-7893", "Employee" }
+                    { 1, "manager@orangland.com", true, "Manager", "123-456-7890" },
+                    { 2, "employee1@orangland.com", false, "Employee1", "123-456-7891" },
+                    { 3, "employee2@orangland.com", false, "Employee2", "123-456-7892" },
+                    { 4, "employee3@orangland.com", false, "Employee3", "123-456-7893" }
                 });
 
             migrationBuilder.InsertData(

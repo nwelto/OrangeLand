@@ -12,7 +12,7 @@ using OrangeLand.Data;
 namespace OrangeLand.Migrations
 {
     [DbContext(typeof(OrangeLandDbContext))]
-    [Migration("20240521015555_InitialCreate")]
+    [Migration("20240521031956_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -330,15 +330,14 @@ namespace OrangeLand.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -351,33 +350,33 @@ namespace OrangeLand.Migrations
                         {
                             Id = 1,
                             Email = "manager@orangland.com",
+                            IsAdmin = true,
                             Name = "Manager",
-                            Phone = "123-456-7890",
-                            Role = "Manager"
+                            Phone = "123-456-7890"
                         },
                         new
                         {
                             Id = 2,
                             Email = "employee1@orangland.com",
+                            IsAdmin = false,
                             Name = "Employee1",
-                            Phone = "123-456-7891",
-                            Role = "Employee"
+                            Phone = "123-456-7891"
                         },
                         new
                         {
                             Id = 3,
                             Email = "employee2@orangland.com",
+                            IsAdmin = false,
                             Name = "Employee2",
-                            Phone = "123-456-7892",
-                            Role = "Employee"
+                            Phone = "123-456-7892"
                         },
                         new
                         {
                             Id = 4,
                             Email = "employee3@orangland.com",
+                            IsAdmin = false,
                             Name = "Employee3",
-                            Phone = "123-456-7893",
-                            Role = "Employee"
+                            Phone = "123-456-7893"
                         });
                 });
 

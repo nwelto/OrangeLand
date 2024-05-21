@@ -9,7 +9,7 @@ namespace OrangeLand.API
     {
         public static void Map(WebApplication app)
         {
-            // GET users
+            // Get user by ID
             app.MapGet("/users/{userId}", (OrangeLandDbContext db, int userId) =>
             {
                 var user = db.Users.Find(userId);
@@ -25,32 +25,41 @@ namespace OrangeLand.API
                     Name = user.Name,
                     Email = user.Email,
                     Phone = user.Phone,
-                    Role = user.Role
+                    IsAdmin = user.IsAdmin
                 };
 
                 return Results.Ok(userDetails);
             });
 
-            // POSTusers
-            app.MapPost("/users", async (OrangeLandDbContext db, Users newUser) =>
+            // Create user
+            app.MapPost("/users", (OrangeLandDbContext db, CreateUserDTO newUserDto) =>
             {
-                if (string.IsNullOrWhiteSpace(newUser.Name) || string.IsNullOrWhiteSpace(newUser.Email) || string.IsNullOrWhiteSpace(newUser.Role))
+                if (string.IsNullOrWhiteSpace(newUserDto.Name) || string.IsNullOrWhiteSpace(newUserDto.Email))
                 {
-                    return Results.BadRequest("Name, Email, and Role are required fields.");
+                    return Results.BadRequest("Name and Email are required fields.");
                 }
 
-                var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+                var existingUser = db.Users.FirstOrDefault(u => u.Email == newUserDto.Email);
                 if (existingUser != null)
                 {
                     return Results.BadRequest("A user with this email already exists.");
                 }
 
+                var newUser = new Users
+                {
+                    Name = newUserDto.Name,
+                    Email = newUserDto.Email,
+                    Phone = newUserDto.Phone,
+                    IsAdmin = false 
+                };
+
                 db.Users.Add(newUser);
-                await db.SaveChangesAsync();
+                db.SaveChanges();
 
                 return Results.Created($"/users/{newUser.Id}", newUser);
             });
-            // GET users
+
+            // Get all users
             app.MapGet("/users", (OrangeLandDbContext db) =>
             {
                 var users = db.Users.Select(user => new
@@ -59,13 +68,14 @@ namespace OrangeLand.API
                     Name = user.Name,
                     Email = user.Email,
                     Phone = user.Phone,
-                    Role = user.Role
+                    IsAdmin = user.IsAdmin
                 }).ToList();
 
                 return Results.Ok(users);
             });
-            // PUT /users/{userId}
-            app.MapPut("/users/{userId}", (OrangeLandDbContext db, int userId, UpdateUserDTO updatedUser) =>
+
+            // Update user
+            app.MapPut("/users/{userId}", (OrangeLandDbContext db, int userId, UpdateUserDTO updatedUserDto) =>
             {
                 var user = db.Users.Find(userId);
 
@@ -75,9 +85,9 @@ namespace OrangeLand.API
                 }
 
                 // Check for unique email
-                if (!string.IsNullOrWhiteSpace(updatedUser.Email) && updatedUser.Email != user.Email)
+                if (!string.IsNullOrWhiteSpace(updatedUserDto.Email) && updatedUserDto.Email != user.Email)
                 {
-                    var existingUser = db.Users.FirstOrDefault(u => u.Email == updatedUser.Email);
+                    var existingUser = db.Users.FirstOrDefault(u => u.Email == updatedUserDto.Email);
                     if (existingUser != null)
                     {
                         return Results.BadRequest("A user with this email already exists.");
@@ -85,16 +95,16 @@ namespace OrangeLand.API
                 }
 
                 // Update the user's details
-                user.Name = updatedUser.Name ?? user.Name;
-                user.Email = updatedUser.Email ?? user.Email;
-                user.Phone = updatedUser.Phone ?? user.Phone;
-                user.Role = updatedUser.Role ?? user.Role;
+                user.Name = updatedUserDto.Name ?? user.Name;
+                user.Email = updatedUserDto.Email ?? user.Email;
+                user.Phone = updatedUserDto.Phone ?? user.Phone;
 
                 db.SaveChanges();
 
                 return Results.Ok(user);
             });
-            // DELETE users
+
+            // Delete user
             app.MapDelete("/users/{userId}", (OrangeLandDbContext db, int userId) =>
             {
                 var user = db.Users.Find(userId);
@@ -109,10 +119,10 @@ namespace OrangeLand.API
 
                 return Results.Ok("User successfully deleted.");
             });
-
-
         }
     }
 }
+
+
 
 
