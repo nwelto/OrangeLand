@@ -2,10 +2,14 @@
 {
     public class Guests
     {
-        public int GuestId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string RVType { get; set; }
         public int? PreferredSiteId { get; set; }
+
+        public ICollection<Reservations> Reservations { get; set; }
     }
 }
+
+
 
