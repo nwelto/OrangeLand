@@ -31,25 +31,34 @@ namespace OrangeLand.API
                 return Results.Ok(userDetails);
             });
 
-            // POSTusers
-            app.MapPost("/users", async (OrangeLandDbContext db, Users newUser) =>
+            // POST users
+            app.MapPost("/users", (OrangeLandDbContext db, CreateUserDTO newUserDto) =>
             {
-                if (string.IsNullOrWhiteSpace(newUser.Name) || string.IsNullOrWhiteSpace(newUser.Email) || string.IsNullOrWhiteSpace(newUser.Role))
+                if (string.IsNullOrWhiteSpace(newUserDto.Name) || string.IsNullOrWhiteSpace(newUserDto.Email) || !newUserDto.IsValidRole())
                 {
-                    return Results.BadRequest("Name, Email, and Role are required fields.");
+                    return Results.BadRequest("Name, Email, and valid Role are required fields.");
                 }
 
-                var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+                var existingUser = db.Users.FirstOrDefault(u => u.Email == newUserDto.Email);
                 if (existingUser != null)
                 {
                     return Results.BadRequest("A user with this email already exists.");
                 }
 
+                var newUser = new Users
+                {
+                    Name = newUserDto.Name,
+                    Email = newUserDto.Email,
+                    Phone = newUserDto.Phone,
+                    Role = newUserDto.Role
+                };
+
                 db.Users.Add(newUser);
-                await db.SaveChangesAsync();
+                db.SaveChanges();
 
                 return Results.Created($"/users/{newUser.Id}", newUser);
             });
+
             // GET users
             app.MapGet("/users", (OrangeLandDbContext db) =>
             {
@@ -64,7 +73,8 @@ namespace OrangeLand.API
 
                 return Results.Ok(users);
             });
-            // PUT /users/{userId}
+
+            // PUT users
             app.MapPut("/users/{userId}", (OrangeLandDbContext db, int userId, UpdateUserDTO updatedUser) =>
             {
                 var user = db.Users.Find(userId);
@@ -74,7 +84,11 @@ namespace OrangeLand.API
                     return Results.NotFound("User not found.");
                 }
 
-                // Check for unique email
+                if (!string.IsNullOrWhiteSpace(updatedUser.Role) && !updatedUser.IsValidRole())
+                {
+                    return Results.BadRequest("Role must be either 'Manager' or 'Employee'.");
+                }
+
                 if (!string.IsNullOrWhiteSpace(updatedUser.Email) && updatedUser.Email != user.Email)
                 {
                     var existingUser = db.Users.FirstOrDefault(u => u.Email == updatedUser.Email);
@@ -84,7 +98,7 @@ namespace OrangeLand.API
                     }
                 }
 
-                // Update the user's details
+              
                 user.Name = updatedUser.Name ?? user.Name;
                 user.Email = updatedUser.Email ?? user.Email;
                 user.Phone = updatedUser.Phone ?? user.Phone;
@@ -94,6 +108,7 @@ namespace OrangeLand.API
 
                 return Results.Ok(user);
             });
+
             // DELETE users
             app.MapDelete("/users/{userId}", (OrangeLandDbContext db, int userId) =>
             {
@@ -109,8 +124,6 @@ namespace OrangeLand.API
 
                 return Results.Ok("User successfully deleted.");
             });
-
-
         }
     }
 }
