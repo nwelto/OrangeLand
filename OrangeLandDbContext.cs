@@ -54,14 +54,14 @@ namespace OrangeLand.Data
         new RVSites { Id = 10, SiteNumber = "E2", HasGrassyArea = false, IsPullThrough = true }
             });
 
-            // Seed data for Reservations
             modelBuilder.Entity<Reservations>().HasData(new Reservations[]
             {
-        new Reservations { Id = 1, UserId = 2, SiteId = 1, GuestId = 1, StartDate = "2024-06-01", EndDate = "2024-06-10", NumberOfGuests = 1, NumberOfDogs = 0, Status = "Confirmed" },
-        new Reservations { Id = 2, UserId = 3, SiteId = 2, GuestId = 2, StartDate = "2024-06-02", EndDate = "2024-06-11", NumberOfGuests = 1, NumberOfDogs = 0, Status = "Confirmed" },
-        new Reservations { Id = 3, UserId = 4, SiteId = 3, GuestId = 3, StartDate = "2024-06-03", EndDate = "2024-06-12", NumberOfGuests = 1, NumberOfDogs = 0, Status = "Confirmed" },
-        new Reservations { Id = 4, UserId = 2, SiteId = 4, GuestId = 4, StartDate = "2024-06-04", EndDate = "2024-06-13", NumberOfGuests = 1, NumberOfDogs = 0, Status = "Confirmed" }
+    new Reservations { Id = 1, UserId = 2, SiteId = 1, GuestId = 1, StartDate = "2024-06-01", EndDate = "2024-06-10", NumberOfGuests = 1, NumberOfDogs = 0, Status = ReservationStatus.Confirmed },
+    new Reservations { Id = 2, UserId = 3, SiteId = 2, GuestId = 2, StartDate = "2024-06-02", EndDate = "2024-06-11", NumberOfGuests = 1, NumberOfDogs = 0, Status = ReservationStatus.Confirmed },
+    new Reservations { Id = 3, UserId = 4, SiteId = 3, GuestId = 3, StartDate = "2024-06-03", EndDate = "2024-06-12", NumberOfGuests = 1, NumberOfDogs = 0, Status = ReservationStatus.Confirmed },
+    new Reservations { Id = 4, UserId = 2, SiteId = 4, GuestId = 4, StartDate = "2024-06-04", EndDate = "2024-06-13", NumberOfGuests = 1, NumberOfDogs = 0, Status = ReservationStatus.Confirmed }
             });
+
 
             // Seed data for Bikes
             modelBuilder.Entity<Bikes>().HasData(new Bikes[]
@@ -83,6 +83,7 @@ namespace OrangeLand.Data
 
             modelBuilder.Entity<BikeRentals>()
                 .HasKey(br => new { br.ReservationId, br.BikeId });
+
         }
 
     }

@@ -1,6 +1,7 @@
 using OrangeLand.Models;
 using OrangeLand.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using OrangeLand.API;
@@ -11,6 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddNpgsql<OrangeLandDbContext>(builder.Configuration["OrangeLandDbConnectionString"]);
 builder.Services.AddControllers();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -42,5 +49,6 @@ app.MapControllers();
 UsersAPI.Map(app);
 GuestsAPI.Map(app);
 RVSitesAPI.Map(app);
+ReservationsAPI.Map(app);
 
 app.Run();
