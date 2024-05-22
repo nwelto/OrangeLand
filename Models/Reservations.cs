@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
-
-namespace OrangeLand.Models
+﻿namespace OrangeLand.Models
 {
+    public enum ReservationStatus
+    {
+        Pending,
+        Confirmed,
+        Closed
+    }
+
     public class Reservations
     {
         public int Id { get; set; }
@@ -12,7 +17,7 @@ namespace OrangeLand.Models
         public string EndDate { get; set; }
         public int NumberOfGuests { get; set; }
         public int NumberOfDogs { get; set; }
-        public string Status { get; set; }
+        public ReservationStatus Status { get; set; }
 
         public Users User { get; set; }
         public RVSites Site { get; set; }
@@ -20,6 +25,9 @@ namespace OrangeLand.Models
         public ICollection<BikeRentals> BikeRentals { get; set; }
     }
 }
+
+
+
 
 
 
