@@ -40,6 +40,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 UsersAPI.Map(app);
-
+GuestsAPI.Map(app);
 
 app.Run();
