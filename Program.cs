@@ -50,5 +50,6 @@ UsersAPI.Map(app);
 GuestsAPI.Map(app);
 RVSitesAPI.Map(app);
 ReservationsAPI.Map(app);
+BikesAPI.Map(app);
 
 app.Run();
