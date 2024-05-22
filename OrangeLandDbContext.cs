@@ -45,7 +45,13 @@ namespace OrangeLand.Data
         new RVSites { Id = 1, SiteNumber = "A1", HasGrassyArea = true, IsPullThrough = false },
         new RVSites { Id = 2, SiteNumber = "A2", HasGrassyArea = false, IsPullThrough = true },
         new RVSites { Id = 3, SiteNumber = "B1", HasGrassyArea = true, IsPullThrough = false },
-        new RVSites { Id = 4, SiteNumber = "B2", HasGrassyArea = false, IsPullThrough = true }
+        new RVSites { Id = 4, SiteNumber = "B2", HasGrassyArea = false, IsPullThrough = true },
+        new RVSites { Id = 5, SiteNumber = "C1", HasGrassyArea = true, IsPullThrough = false },
+        new RVSites { Id = 6, SiteNumber = "C2", HasGrassyArea = false, IsPullThrough = true },
+        new RVSites { Id = 7, SiteNumber = "D1", HasGrassyArea = true, IsPullThrough = false },
+        new RVSites { Id = 8, SiteNumber = "D2", HasGrassyArea = false, IsPullThrough = true },
+        new RVSites { Id = 9, SiteNumber = "E1", HasGrassyArea = true, IsPullThrough = false },
+        new RVSites { Id = 10, SiteNumber = "E2", HasGrassyArea = false, IsPullThrough = true }
             });
 
             // Seed data for Reservations

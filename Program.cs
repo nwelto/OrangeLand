@@ -41,5 +41,6 @@ app.UseAuthorization();
 app.MapControllers();
 UsersAPI.Map(app);
 GuestsAPI.Map(app);
+RVSitesAPI.Map(app);
 
 app.Run();
