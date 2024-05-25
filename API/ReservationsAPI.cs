@@ -126,7 +126,6 @@ namespace OrangeLand.API
             // Update an existing reservation
             app.MapPut("/reservations/{reservationId}", async (OrangeLandDbContext db, int reservationId, ReservationDTO updatedReservationDto) =>
             {
-
                 var reservation = await db.Reservations
                     .Include(r => r.User)
                     .Include(r => r.Site)
@@ -178,12 +177,12 @@ namespace OrangeLand.API
                     reservation.EndDate = updatedReservationDto.EndDate;
                 }
 
-                if (updatedReservationDto.NumberOfGuests.HasValue)
+                if (updatedReservationDto.NumberOfGuests.HasValue && updatedReservationDto.NumberOfGuests.Value > 0)
                 {
                     reservation.NumberOfGuests = updatedReservationDto.NumberOfGuests.Value;
                 }
 
-                if (updatedReservationDto.NumberOfDogs.HasValue)
+                if (updatedReservationDto.NumberOfDogs.HasValue && updatedReservationDto.NumberOfDogs.Value > 0)
                 {
                     reservation.NumberOfDogs = updatedReservationDto.NumberOfDogs.Value;
                 }
@@ -194,7 +193,6 @@ namespace OrangeLand.API
                 }
 
                 await db.SaveChangesAsync();
-
 
                 var updatedReservationDtoResult = new ReservationDTO
                 {
@@ -211,6 +209,7 @@ namespace OrangeLand.API
 
                 return Results.Ok(updatedReservationDtoResult);
             });
+
 
             app.MapDelete("/reservations/{reservationId}", (OrangeLandDbContext db, int reservationId) =>
             {
@@ -305,7 +304,6 @@ namespace OrangeLand.API
 
                 db.BikeRentals.Remove(bikeRental);
 
-                // Update bike availability
                 var bike = await db.Bikes.FirstOrDefaultAsync(b => b.Id == bikeId);
                 if (bike != null)
                 {

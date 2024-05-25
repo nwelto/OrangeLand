@@ -33,10 +33,10 @@ namespace OrangeLand.Data
             // Seed data for Guests
             modelBuilder.Entity<Guests>().HasData(new Guests[]
             {
-        new Guests { Id = 1, Name = "Amuro Ray", RVType = "Mobile Suit", PreferredSiteId = 1 },
-        new Guests { Id = 2, Name = "Char Aznable", RVType = "Mobile Suit", PreferredSiteId = 2 },
-        new Guests { Id = 3, Name = "Kamille Bidan", RVType = "Mobile Suit", PreferredSiteId = 3 },
-        new Guests { Id = 4, Name = "Haman Karn", RVType = "Mobile Suit", PreferredSiteId = 4 }
+        new Guests { Id = 1, Name = "Amuro Ray", RVType = "Mobile Suit" },
+        new Guests { Id = 2, Name = "Char Aznable", RVType = "Mobile Suit" },
+        new Guests { Id = 3, Name = "Kamille Bidan", RVType = "Mobile Suit" },
+        new Guests { Id = 4, Name = "Haman Karn", RVType = "Mobile Suit" }
             });
 
             // Seed data for RVSites
