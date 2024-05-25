@@ -232,6 +232,91 @@ namespace OrangeLand.API
             });
 
 
+            // Add bike to reservation
+            app.MapPost("/reservations/{reservationId}/bikes", async (OrangeLandDbContext db, int reservationId, BikeRentalDTO bikeRentalDto) =>
+            {
+                var reservationExists = await db.Reservations.AnyAsync(r => r.Id == reservationId);
+                if (!reservationExists)
+                {
+                    return Results.NotFound("Reservation not found.");
+                }
+
+                var bike = await db.Bikes.FirstOrDefaultAsync(b => b.Id == bikeRentalDto.BikeId);
+                if (bike == null)
+                {
+                    return Results.BadRequest("Bike not found.");
+                }
+
+                var bikeIsRented = await db.BikeRentals
+                    .Include(br => br.Reservation)
+                    .AnyAsync(br => br.BikeId == bikeRentalDto.BikeId && br.Reservation.Status == ReservationStatus.Pending || br.Reservation.Status == ReservationStatus.Confirmed);
+
+                if (bikeIsRented)
+                {
+                    return Results.BadRequest("Bike is already rented.");
+                }
+
+                var bikeRental = new BikeRentals
+                {
+                    ReservationId = reservationId,
+                    BikeId = bikeRentalDto.BikeId
+                };
+
+                db.BikeRentals.Add(bikeRental);
+
+                bike.IsAvailable = false;
+
+                await db.SaveChangesAsync();
+
+                return Results.Created($"/reservations/{reservationId}/bikes/{bikeRentalDto.BikeId}", bikeRentalDto);
+            });
+
+            // Get bikes for a reservation
+            app.MapGet("/reservations/{reservationId}/bikes", async (OrangeLandDbContext db, int reservationId) =>
+            {
+                var bikeRentals = await db.BikeRentals
+                    .Where(br => br.ReservationId == reservationId)
+                    .Select(br => new BikesDTO
+                    {
+                        Id = br.Bike.Id,
+                        Type = br.Bike.Type,
+                        RentalFee = br.Bike.RentalFee,
+                        IsAvailable = br.Bike.IsAvailable
+                    })
+                    .ToListAsync();
+
+                if (bikeRentals == null || bikeRentals.Count == 0)
+                {
+                    return Results.NotFound("No bikes found for this reservation.");
+                }
+
+                return Results.Ok(bikeRentals);
+            });
+            // Remove bike from reservation
+            app.MapDelete("/reservations/{reservationId}/bikes/{bikeId}", async (OrangeLandDbContext db, int reservationId, int bikeId) =>
+            {
+                var bikeRental = await db.BikeRentals
+                    .FirstOrDefaultAsync(br => br.ReservationId == reservationId && br.BikeId == bikeId);
+
+                if (bikeRental == null)
+                {
+                    return Results.NotFound("Bike rental not found for this reservation.");
+                }
+
+                db.BikeRentals.Remove(bikeRental);
+
+                // Update bike availability
+                var bike = await db.Bikes.FirstOrDefaultAsync(b => b.Id == bikeId);
+                if (bike != null)
+                {
+                    bike.IsAvailable = true;
+                }
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok("Bike removed from reservation successfully.");
+            });
+
         }
     }
 }

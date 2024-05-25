@@ -66,10 +66,27 @@ namespace OrangeLand.Data
             // Seed data for Bikes
             modelBuilder.Entity<Bikes>().HasData(new Bikes[]
             {
-        new Bikes { Id = 1, Type = "Mountain Bike", RentalFee = 15.00m, IsAvailable = true },
-        new Bikes { Id = 2, Type = "Road Bike", RentalFee = 12.00m, IsAvailable = true },
-        new Bikes { Id = 3, Type = "Hybrid Bike", RentalFee = 10.00m, IsAvailable = true },
-        new Bikes { Id = 4, Type = "Electric Bike", RentalFee = 20.00m, IsAvailable = true }
+
+                new Bikes { Id = 1, Type = "Mountain Bike", RentalFee = 15.00m, IsAvailable = true },
+                new Bikes { Id = 2, Type = "Mountain Bike", RentalFee = 15.00m, IsAvailable = true },
+                new Bikes { Id = 3, Type = "Mountain Bike", RentalFee = 15.00m, IsAvailable = true },
+                new Bikes { Id = 4, Type = "Mountain Bike", RentalFee = 15.00m, IsAvailable = true },
+                new Bikes { Id = 5, Type = "Mountain Bike", RentalFee = 15.00m, IsAvailable = true },
+                new Bikes { Id = 6, Type = "Road Bike", RentalFee = 12.00m, IsAvailable = true },
+                new Bikes { Id = 7, Type = "Road Bike", RentalFee = 12.00m, IsAvailable = true },
+                new Bikes { Id = 8, Type = "Road Bike", RentalFee = 12.00m, IsAvailable = true },
+                new Bikes { Id = 9, Type = "Road Bike", RentalFee = 12.00m, IsAvailable = true },
+                new Bikes { Id = 10, Type = "Road Bike", RentalFee = 12.00m, IsAvailable = true },
+                new Bikes { Id = 11, Type = "Hybrid Bike", RentalFee = 10.00m, IsAvailable = true },
+                new Bikes { Id = 12, Type = "Hybrid Bike", RentalFee = 10.00m, IsAvailable = true },
+                new Bikes { Id = 13, Type = "Hybrid Bike", RentalFee = 10.00m, IsAvailable = true },
+                new Bikes { Id = 14, Type = "Hybrid Bike", RentalFee = 10.00m, IsAvailable = true },
+                new Bikes { Id = 15, Type = "Hybrid Bike", RentalFee = 10.00m, IsAvailable = true },
+                new Bikes { Id = 16, Type = "Electric Bike", RentalFee = 20.00m, IsAvailable = true },
+                new Bikes { Id = 17, Type = "Electric Bike", RentalFee = 20.00m, IsAvailable = true },
+                new Bikes { Id = 18, Type = "Electric Bike", RentalFee = 20.00m, IsAvailable = true },
+                new Bikes { Id = 19, Type = "Electric Bike", RentalFee = 20.00m, IsAvailable = true },
+                new Bikes { Id = 20, Type = "Electric Bike", RentalFee = 20.00m, IsAvailable = true }
             });
 
             // Seed data for BikeRentals
