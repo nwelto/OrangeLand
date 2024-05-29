@@ -13,6 +13,7 @@ namespace OrangeLand.DTO
         public int? NumberOfGuests { get; set; }
         public int? NumberOfDogs { get; set; }
         public ReservationStatus? Status { get; set; }
+        public List<BikeRentalDTO> BikeRentals { get; set; } 
     }
 }
 
