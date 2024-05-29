@@ -69,59 +69,85 @@ namespace OrangeLand.API
 
                 return Results.Created($"/reservations/{createdReservationDto.Id}", createdReservationDto);
             });
-            // get all reservations
-            app.MapGet("/reservations", (OrangeLandDbContext db) =>
+            // Get all reservations
+            app.MapGet("/reservations", async (OrangeLandDbContext db) =>
             {
-                var reservations = db.Reservations
-                    .Include(r => r.User)
-                    .Include(r => r.Site)
-                    .Include(r => r.Guest)
-                    .Select(r => new ReservationDTO
-                    {
-                        Id = r.Id,
-                        UserId = r.UserId,
-                        SiteId = r.SiteId,
-                        GuestId = r.GuestId,
-                        StartDate = r.StartDate,
-                        EndDate = r.EndDate,
-                        NumberOfGuests = r.NumberOfGuests,
-                        NumberOfDogs = r.NumberOfDogs,
-                        Status = r.Status
-                    })
-                    .ToList();
+                var reservations = await db.Reservations
+                    .Include(r => r.BikeRentals)
+                    .ThenInclude(br => br.Bike)
+                    .ToListAsync();
 
-                return Results.Ok(reservations);
+                var reservationDtos = reservations.Select(r => new ReservationDTO
+                {
+                    Id = r.Id,
+                    UserId = r.UserId,
+                    SiteId = r.SiteId,
+                    GuestId = r.GuestId,
+                    StartDate = r.StartDate,
+                    EndDate = r.EndDate,
+                    NumberOfGuests = r.NumberOfGuests,
+                    NumberOfDogs = r.NumberOfDogs,
+                    Status = r.Status,
+                    BikeRentals = r.BikeRentals.Select(br => new BikeRentalDTO
+                    {
+                        ReservationId = br.ReservationId,
+                        BikeId = br.BikeId,
+                        Bike = new BikeResDTO
+                        {
+                            RentalFee = br.Bike.RentalFee
+                        }
+                    }).ToList()
+                }).ToList();
+
+                return Results.Ok(reservationDtos);
             });
 
-            // get single reservation
-            app.MapGet("/reservations/{id}", (OrangeLandDbContext db, int id) =>
+
+
+
+
+            // Get a single reservation by ID
+            app.MapGet("/reservations/{reservationId}", async (OrangeLandDbContext db, int reservationId) =>
             {
-                var reservation = db.Reservations
-                    .Include(r => r.User)
-                    .Include(r => r.Site)
-                    .Include(r => r.Guest)
-                    .Where(r => r.Id == id)
-                    .Select(r => new ReservationDTO
-                    {
-                        Id = r.Id,
-                        UserId = r.UserId,
-                        SiteId = r.SiteId,
-                        GuestId = r.GuestId,
-                        StartDate = r.StartDate,
-                        EndDate = r.EndDate,
-                        NumberOfGuests = r.NumberOfGuests,
-                        NumberOfDogs = r.NumberOfDogs,
-                        Status = r.Status
-                    })
-                    .FirstOrDefault();
+                var reservation = await db.Reservations
+                    .Include(r => r.BikeRentals)
+                    .ThenInclude(br => br.Bike)
+                    .FirstOrDefaultAsync(r => r.Id == reservationId);
 
                 if (reservation == null)
                 {
                     return Results.NotFound("Reservation not found.");
                 }
 
-                return Results.Ok(reservation);
+                var reservationDto = new ReservationDTO
+                {
+                    Id = reservation.Id,
+                    UserId = reservation.UserId,
+                    SiteId = reservation.SiteId,
+                    GuestId = reservation.GuestId,
+                    StartDate = reservation.StartDate,
+                    EndDate = reservation.EndDate,
+                    NumberOfGuests = reservation.NumberOfGuests,
+                    NumberOfDogs = reservation.NumberOfDogs,
+                    Status = reservation.Status,
+                    BikeRentals = reservation.BikeRentals.Select(br => new BikeRentalDTO
+                    {
+                        ReservationId = br.ReservationId,
+                        BikeId = br.BikeId,
+                        Bike = new BikeResDTO
+                        {
+                            RentalFee = br.Bike.RentalFee
+                        }
+                    }).ToList()
+                };
+
+                return Results.Ok(reservationDto);
             });
+
+
+
+
+
 
             // Update an existing reservation
             app.MapPut("/reservations/{reservationId}", async (OrangeLandDbContext db, int reservationId, ReservationDTO updatedReservationDto) =>

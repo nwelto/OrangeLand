@@ -10,42 +10,54 @@ namespace OrangeLand.API
         public static void Map(WebApplication app)
         {
 
-            //Get all bikes
-            app.MapGet("/bikes", (OrangeLandDbContext db) =>
+            // Get all bikes
+            app.MapGet("/bikes", async (OrangeLandDbContext db) =>
             {
-                var bikes = db.Bikes
-                    .Select(b => new BikesDTO
-                    {
-                        Id = b.Id,
-                        Type = b.Type,
-                        RentalFee = b.RentalFee,
-                        IsAvailable = b.IsAvailable
-                    })
-                    .ToList();
+                var bikes = await db.Bikes
+                    .Include(b => b.BikeRentals)
+                    .ToListAsync();
 
-                return Results.Ok(bikes);
-            });
-            //Get single bike
-            app.MapGet("/bikes/{bikeId}", (OrangeLandDbContext db, int bikeId) =>
-            {
-                var bike = db.Bikes
-                    .Where(b => b.Id == bikeId)
-                    .Select(b => new BikesDTO
+                var bikesDtos = bikes.Select(b => new
+                {
+                    b.Id,
+                    b.Type,
+                    b.RentalFee,
+                    b.IsAvailable,
+                    BikeRentals = b.BikeRentals.Select(br => new
                     {
-                        Id = b.Id,
-                        Type = b.Type,
-                        RentalFee = b.RentalFee,
-                        IsAvailable = b.IsAvailable
-                    })
-                    .FirstOrDefault();
+                        br.ReservationId
+                    }).ToList()
+                }).ToList();
+
+                return Results.Ok(bikesDtos);
+            });
+
+
+
+
+
+            // Get a single bike by ID
+            app.MapGet("/bikes/{bikeId}", async (OrangeLandDbContext db, int bikeId) =>
+            {
+                var bike = await db.Bikes
+                    .FirstOrDefaultAsync(b => b.Id == bikeId);
 
                 if (bike == null)
                 {
                     return Results.NotFound("Bike not found.");
                 }
 
-                return Results.Ok(bike);
+                var bikeDto = new
+                {
+                    Id = bike.Id,
+                    Type = bike.Type,
+                    RentalFee = bike.RentalFee,
+                    IsAvailable = bike.IsAvailable
+                };
+
+                return Results.Ok(bikeDto);
             });
+
         }
     }
 }

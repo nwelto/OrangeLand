@@ -6,5 +6,7 @@
         public string Type { get; set; }
         public decimal RentalFee { get; set; }
         public bool IsAvailable { get; set; }
+        public List<BikeRentalDTO> BikeRentals { get; set; }
     }
 }
+

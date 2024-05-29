@@ -1,4 +1,6 @@
-﻿namespace OrangeLand.Models
+﻿using OrangeLand.DTO;
+
+namespace OrangeLand.Models
 {
     public class Bikes
     {
@@ -6,7 +8,6 @@
         public string Type { get; set; }
         public decimal RentalFee { get; set; }
         public bool IsAvailable { get; set; }
-
         public ICollection<BikeRentals> BikeRentals { get; set; }
     }
 }
