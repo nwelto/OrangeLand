@@ -24,19 +24,20 @@ namespace OrangeLand.Data
             // Seed data for Users
             modelBuilder.Entity<Users>().HasData(new Users[]
             {
-        new Users { Id = 1, Name = "Manager", Email = "manager@orangland.com", Phone = "123-456-7890", IsAdmin = true },
-        new Users { Id = 2, Name = "Employee1", Email = "employee1@orangland.com", Phone = "123-456-7891", IsAdmin = false },
-        new Users { Id = 3, Name = "Employee2", Email = "employee2@orangland.com", Phone = "123-456-7892", IsAdmin = false },
-        new Users { Id = 4, Name = "Employee3", Email = "employee3@orangland.com", Phone = "123-456-7893", IsAdmin = false }
+        new Users { Id = 1, Uid = "DJNoS94RYXSgpS0jTW7RSVlWyCG3", Name = "Manager", Email = "manager@orangland.com", IsAdmin = true },
+        new Users { Id = 2, Uid = "pVt45Of2j2ThgpcIPKruq1pKn4A2", Name = "Employee1", Email = "employee1@orangland.com", IsAdmin = false },
+        new Users { Id = 3, Uid = "udUYrA1rU1huTDv7dIsRYDcdLwl2", Name = "Employee2", Email = "employee2@orangland.com", IsAdmin = false },
+        new Users { Id = 4, Uid = "vaO8Bo1J2SVL7O2grpe1r0Lef9R2", Name = "Employee3", Email = "employee3@orangland.com",  IsAdmin = false },
+        new Users { Id = 8, Uid = "R14xkEO4dWbOISMu0hnPkNCBpSt1", Name = "Nathan Welton", Email = "nathopp@gmail.com",  IsAdmin = true }
             });
 
             // Seed data for Guests
             modelBuilder.Entity<Guests>().HasData(new Guests[]
             {
-        new Guests { Id = 1, Name = "Amuro Ray", RVType = "Mobile Suit" },
-        new Guests { Id = 2, Name = "Char Aznable", RVType = "Mobile Suit" },
-        new Guests { Id = 3, Name = "Kamille Bidan", RVType = "Mobile Suit" },
-        new Guests { Id = 4, Name = "Haman Karn", RVType = "Mobile Suit" }
+        new Guests { Id = 1, Name = "Amuro Ray", RVType = "Mobile Suit", PhoneNumber = "123-456-7890", Email = "amuro.ray@example.com" },
+        new Guests { Id = 2, Name = "Char Aznable", RVType = "Mobile Suit", PhoneNumber = "234-567-8901", Email = "char.aznable@example.com" },
+        new Guests { Id = 3, Name = "Kamille Bidan", RVType = "Mobile Suit", PhoneNumber = "345-678-9012", Email = "kamille.bidan@example.com" },
+        new Guests { Id = 4, Name = "Haman Karn", RVType = "Mobile Suit", PhoneNumber = "456-789-0123", Email = "haman.karn@example.com" }
             });
 
             // Seed data for RVSites

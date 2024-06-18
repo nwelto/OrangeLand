@@ -20,7 +20,9 @@ namespace OrangeLand.API
                 var newGuest = new Guests
                 {
                     Name = newGuestDto.Name,
-                    RVType = newGuestDto.RVType
+                    RVType = newGuestDto.RVType,
+                    PhoneNumber = newGuestDto.PhoneNumber,
+                    Email = newGuestDto.Email
                 };
 
                 db.Guests.Add(newGuest);
@@ -33,7 +35,7 @@ namespace OrangeLand.API
             app.MapPut("/guests/{guestId}", async (OrangeLandDbContext db, int guestId, UpdateGuestDTO updatedGuestDto) =>
             {
                 var guestToUpdate = await db.Guests
-                                            .Include(g => g.Reservations) 
+                                            .Include(g => g.Reservations)
                                             .FirstOrDefaultAsync(g => g.Id == guestId);
 
                 if (guestToUpdate == null)
@@ -51,6 +53,16 @@ namespace OrangeLand.API
                     guestToUpdate.RVType = updatedGuestDto.RVType;
                 }
 
+                if (!string.IsNullOrEmpty(updatedGuestDto.PhoneNumber))
+                {
+                    guestToUpdate.PhoneNumber = updatedGuestDto.PhoneNumber;
+                }
+
+                if (!string.IsNullOrEmpty(updatedGuestDto.Email))
+                {
+                    guestToUpdate.Email = updatedGuestDto.Email;
+                }
+
                 await db.SaveChangesAsync();
 
                 var result = new
@@ -58,6 +70,8 @@ namespace OrangeLand.API
                     guestToUpdate.Id,
                     guestToUpdate.Name,
                     guestToUpdate.RVType,
+                    guestToUpdate.PhoneNumber,
+                    guestToUpdate.Email,
                     Reservations = guestToUpdate.Reservations.Select(r => new
                     {
                         r.Id,
@@ -70,10 +84,6 @@ namespace OrangeLand.API
                 return Results.Ok(result);
             });
 
-
-
-
-
             // Get guests
             app.MapGet("/guests", (OrangeLandDbContext db) =>
             {
@@ -81,7 +91,9 @@ namespace OrangeLand.API
                 {
                     GuestId = g.Id,
                     Name = g.Name,
-                    RVType = g.RVType
+                    RVType = g.RVType,
+                    PhoneNumber = g.PhoneNumber,
+                    Email = g.Email
                 }).ToList();
 
                 return Results.Ok(guests);
@@ -101,12 +113,13 @@ namespace OrangeLand.API
                 {
                     GuestId = guest.Id,
                     Name = guest.Name,
-                    RVType = guest.RVType
+                    RVType = guest.RVType,
+                    PhoneNumber = guest.PhoneNumber,
+                    Email = guest.Email
                 };
 
                 return Results.Ok(guestDetails);
             });
-
 
             // Delete guest by ID
             app.MapDelete("/guests/{guestId}", (OrangeLandDbContext db, int guestId) =>
@@ -123,7 +136,6 @@ namespace OrangeLand.API
 
                 return Results.Ok("Guest successfully deleted.");
             });
-
         }
     }
 }

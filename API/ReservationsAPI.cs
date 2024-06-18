@@ -274,7 +274,7 @@ namespace OrangeLand.API
 
                 var bikeIsRented = await db.BikeRentals
                     .Include(br => br.Reservation)
-                    .AnyAsync(br => br.BikeId == bikeRentalDto.BikeId && br.Reservation.Status == ReservationStatus.Pending || br.Reservation.Status == ReservationStatus.Confirmed);
+                    .AnyAsync(br => br.BikeId == bikeRentalDto.BikeId && (br.Reservation.Status == ReservationStatus.Pending || br.Reservation.Status == ReservationStatus.Confirmed));
 
                 if (bikeIsRented)
                 {
@@ -293,30 +293,39 @@ namespace OrangeLand.API
 
                 await db.SaveChangesAsync();
 
-                return Results.Created($"/reservations/{reservationId}/bikes/{bikeRentalDto.BikeId}", bikeRentalDto);
+                var response = new
+                {
+                    ReservationId = bikeRental.ReservationId,
+                    BikeId = bikeRental.BikeId
+                };
+
+                return Results.Created($"/reservations/{reservationId}/bikes/{bikeRentalDto.BikeId}", response);
             });
+
 
             // Get bikes for a reservation
             app.MapGet("/reservations/{reservationId}/bikes", async (OrangeLandDbContext db, int reservationId) =>
             {
                 var bikeRentals = await db.BikeRentals
                     .Where(br => br.ReservationId == reservationId)
-                    .Select(br => new BikesDTO
+                    .Include(br => br.Bike) 
+                    .Select(br => new
                     {
-                        Id = br.Bike.Id,
-                        Type = br.Bike.Type,
-                        RentalFee = br.Bike.RentalFee,
-                        IsAvailable = br.Bike.IsAvailable
+                        br.Bike.Id,
+                        br.Bike.Type,
+                        br.Bike.RentalFee,
+                        br.Bike.IsAvailable
                     })
                     .ToListAsync();
 
-                if (bikeRentals == null || bikeRentals.Count == 0)
+                if (!bikeRentals.Any())
                 {
                     return Results.NotFound("No bikes found for this reservation.");
                 }
 
                 return Results.Ok(bikeRentals);
             });
+
             // Remove bike from reservation
             app.MapDelete("/reservations/{reservationId}/bikes/{bikeId}", async (OrangeLandDbContext db, int reservationId, int bikeId) =>
             {
