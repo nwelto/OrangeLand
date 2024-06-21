@@ -10,64 +10,95 @@ namespace OrangeLand.API
         public static void Map(WebApplication app)
         {
 
-            //create new reservation
-            app.MapPost("/reservations", async (OrangeLandDbContext db, ReservationDTO newReservationDto) =>
+            // Create new reservation
+            app.MapPost("/reservations", async (OrangeLandDbContext db, ReservationDTO newReservationDto, ILogger<ReservationsAPI> logger) =>
             {
-                // Check if Guest, User, and Site exist
-                var guestExists = await db.Guests.AnyAsync(g => g.Id == newReservationDto.GuestId);
-                var userExists = await db.Users.AnyAsync(u => u.Id == newReservationDto.UserId);
-                var siteExists = await db.RVSites.AnyAsync(s => s.Id == newReservationDto.SiteId);
-
-                if (!guestExists || !userExists || !siteExists)
+                try
                 {
-                    return Results.BadRequest("Invalid foreign key reference.");
+                  
+                    var guestExists = await db.Guests.AnyAsync(g => g.Id == newReservationDto.GuestId);
+                    var userExists = await db.Users.AnyAsync(u => u.Id == newReservationDto.UserId);
+                    var siteExists = await db.RVSites.AnyAsync(s => s.Id == newReservationDto.SiteId);
+
+                    if (!guestExists || !userExists || !siteExists)
+                    {
+                        logger.LogError("Invalid foreign key reference.");
+                        return Results.BadRequest();
+                    }
+
+               
+                    if (newReservationDto.UserId == null || newReservationDto.SiteId == null || newReservationDto.GuestId == null ||
+                        newReservationDto.StartDate == null || newReservationDto.EndDate == null || newReservationDto.Status == null)
+                    {
+                        logger.LogError("All fields must be provided.");
+                        return Results.BadRequest();
+                    }
+
+                   
+                    var startDate = DateTime.Parse(newReservationDto.StartDate);
+                    var endDate = DateTime.Parse(newReservationDto.EndDate);
+
+                    var reservations = await db.Reservations
+                        .Where(r => r.SiteId == newReservationDto.SiteId)
+                        .ToListAsync();
+
+                    var conflict = reservations
+                        .AsEnumerable()
+                        .Any(r =>
+                            DateTime.Parse(r.StartDate) <= endDate && DateTime.Parse(r.EndDate) >= startDate
+                        );
+
+                    if (conflict)
+                    {
+                        logger.LogError("Reservation conflict detected.");
+                        return Results.Conflict();
+                    }
+
+                    var reservation = new Reservations
+                    {
+                        UserId = newReservationDto.UserId.Value,
+                        SiteId = newReservationDto.SiteId.Value,
+                        GuestId = newReservationDto.GuestId.Value,
+                        StartDate = newReservationDto.StartDate,
+                        EndDate = newReservationDto.EndDate,
+                        NumberOfGuests = newReservationDto.NumberOfGuests ?? 0,
+                        NumberOfDogs = newReservationDto.NumberOfDogs ?? 0,
+                        Status = newReservationDto.Status.Value
+                    };
+
+                    db.Reservations.Add(reservation);
+                    await db.SaveChangesAsync();
+
+            
+                    var createdReservation = await db.Reservations.FindAsync(reservation.Id);
+
+                    if (createdReservation == null)
+                    {
+                        logger.LogError("Reservation not found after creation.");
+                        return Results.NotFound();
+                    }
+
+                   
+                    var createdReservationDto = new ReservationDTO
+                    {
+                        Id = createdReservation.Id,
+                        UserId = createdReservation.UserId,
+                        SiteId = createdReservation.SiteId,
+                        GuestId = createdReservation.GuestId,
+                        StartDate = createdReservation.StartDate,
+                        EndDate = createdReservation.EndDate,
+                        NumberOfGuests = createdReservation.NumberOfGuests,
+                        NumberOfDogs = createdReservation.NumberOfDogs,
+                        Status = createdReservation.Status
+                    };
+
+                    return Results.Created($"/reservations/{createdReservationDto.Id}", createdReservationDto);
                 }
-
-                // Ensure non-nullable fields have values
-                if (newReservationDto.UserId == null || newReservationDto.SiteId == null || newReservationDto.GuestId == null ||
-                    newReservationDto.StartDate == null || newReservationDto.EndDate == null || newReservationDto.Status == null)
+                catch (Exception ex)
                 {
-                    return Results.BadRequest("All fields must be provided.");
+                    logger.LogError(ex, "An error occurred while creating a reservation.");
+                    return Results.Problem("An error occurred while creating a reservation.");
                 }
-
-                var reservation = new Reservations
-                {
-                    UserId = newReservationDto.UserId.Value,
-                    SiteId = newReservationDto.SiteId.Value,
-                    GuestId = newReservationDto.GuestId.Value,
-                    StartDate = newReservationDto.StartDate,
-                    EndDate = newReservationDto.EndDate,
-                    NumberOfGuests = newReservationDto.NumberOfGuests ?? 0,
-                    NumberOfDogs = newReservationDto.NumberOfDogs ?? 0,
-                    Status = newReservationDto.Status.Value
-                };
-
-                db.Reservations.Add(reservation);
-                await db.SaveChangesAsync();
-
-                // Fetch the created reservation
-                var createdReservation = await db.Reservations.FindAsync(reservation.Id);
-
-                if (createdReservation == null)
-                {
-                    return Results.NotFound("Reservation not found.");
-                }
-
-                // Map to DTO
-                var createdReservationDto = new ReservationDTO
-                {
-                    Id = createdReservation.Id,
-                    UserId = createdReservation.UserId,
-                    SiteId = createdReservation.SiteId,
-                    GuestId = createdReservation.GuestId,
-                    StartDate = createdReservation.StartDate,
-                    EndDate = createdReservation.EndDate,
-                    NumberOfGuests = createdReservation.NumberOfGuests,
-                    NumberOfDogs = createdReservation.NumberOfDogs,
-                    Status = createdReservation.Status
-                };
-
-                return Results.Created($"/reservations/{createdReservationDto.Id}", createdReservationDto);
             });
             // Get all reservations
             app.MapGet("/reservations", async (OrangeLandDbContext db) =>
